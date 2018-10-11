@@ -148,7 +148,7 @@ class User():
             if len(self.WS_pvalues[i]) > 1:
                 P = self.WS_pvalues[i]
 
-                if len(P) < 10:
+                if len(P) < 20:
                     continue
                 
                 
@@ -194,7 +194,7 @@ class User():
 
     def get_self_exciting_parameters(self):
         for id1 in self.eventids:
-            if len(self.events_hash[id1]) > 1:
+            if len(self.events_hash[id1]) > 20:
                 
 
                 self.WS_cutoffs[id1] = []

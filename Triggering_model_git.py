@@ -40,8 +40,8 @@ commandlineargs = argparse.ArgumentParser(formatter_class = formatter, descripti
 
 
 
-commandlineargs.add_argument('-u', nargs = 1,  dest = "separate_users", default = Separate_users, metavar = 'PATH', help
-                             = 'Set if you want to model each user separately include the list of users as a text file with each user on a separate line' )
+commandlineargs.add_argument('-u', action = 'store_true', dest = "separate_users", default = Separate_users, help
+                             = 'Set if you want to model each edge separately')
 
 
 
@@ -67,23 +67,22 @@ else:
 
 
 
-if args.separate_users:
-    Users = []
-    Separate_users = True
-    text = open(args.separate_users[0])
-    for line in text:
-        Users += [line.strip()]
-
-
-
-
-
 
 userhash = {}
+if args.separate_users:
+    Separate_users = True
+else:
+    userhash['all'] = User(day)
 
 
 
-userhash['all'] = User(day)
+
+
+
+
+
+
+
 for line in sys.stdin:
 
 
@@ -92,21 +91,36 @@ for line in sys.stdin:
     eventid = fields[1]
 
 
-    user = fields[1]
+    user = fields[3]
 
 
         
+    
+    if Separate_users:
+        if user not in userhash:
+            userhash[user] = User(day)
+        userhash[user].update_data(time, eventid)
+    else:
+        userhash['all'].update_data(time, eventid)
+
+if Separate_users:
+    for user in userhash:
+        event_pairs,Fisher,HC = userhash[user].plot_pvalues()
+
+        for i in range(len(event_pairs)):
+            print (event_pairs[i])
+            print (Fisher[i],'Fishers method')
+            print (HC[i], 'Higher criticism')
 
 
-    userhash['all'].update_data(time, eventid)
 
+else:
+    event_pairs,Fisher,HC = userhash['all'].plot_pvalues()
 
-event_pairs,Fisher,HC = userhash['all'].plot_pvalues()
-
-for i in range(len(event_pairs)):
-    print (event_pairs[i])
-    print (Fisher[i],'Fishers method')
-    print (HC[i], 'Higher criticism')
+    for i in range(len(event_pairs)):
+        print (event_pairs[i])
+        print (Fisher[i],'Fishers method')
+        print (HC[i], 'Higher criticism')
 
 
 
